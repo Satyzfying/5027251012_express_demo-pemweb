@@ -12,7 +12,6 @@
    - [2. Cara Menjalankan](#2-cara-menjalankan)
    - [3. Daftar Endpoint](#3-daftar-endpoint)
    - [4. Bukti Pengujian API & Database](#4-bukti-pengujian-api--database)
-   - [5. Alur Pengerjaan Git](#5-alur-pengerjaan-git)
 
 ---
 
@@ -256,26 +255,3 @@ Data produk ID 1 berhasil dihapus dan tidak lagi ada di tabel database.
 
 - **DELETE dengan ID tidak ada (`DELETE /products/9999`):**  
   ![404 DELETE](docs/tugas-2/16_404_delete.png)
-
----
-
-## 5. Alur Pengerjaan Git
-
-Pengerjaan tugas ini dilakukan secara bertahap menggunakan branch dan pull request:
-
-1. **Tahap 1: Setup Prisma & Migrasi Database**
-   - Branch: `tugas-2/setup-prisma`
-   - Install dependensi Prisma dan driver PostgreSQL.
-   - Definisi skema model `Product` dan migrasi database awal.
-   - Pull Request #1 di-merge ke `main`.
-
-2. **Tahap 2: Implementasi Controller & Route CRUD**
-   - Branch: `tugas-2/crud-products`
-   - Implementasi Prisma Client singleton dan fungsi CRUD pada `product.controller.ts`.
-   - Setup route GET, POST, PUT (ID di body), dan DELETE.
-   - Pull Request #2 di-merge ke `main`.
-
-3. **Tahap 3: Testing & Dokumentasi**
-   - Branch: `tugas-2/testing-docs`
-   - Pembuatan 11 skenario pengujian pada `test.http`.
-   - Dokumentasi pengujian dan bukti screenshot pada `README.md`.
