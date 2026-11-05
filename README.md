@@ -2,20 +2,17 @@
 
 - **Nama:** Satya Putra Aryanta
 - **NRP:** 5027251012
-- **Departemen:** Teknologi Informasi - Fakultas Teknologi Elektro dan Informatika Cerdas (FTEIC), Institut Teknologi Sepuluh Nopember
-- **Mata Kuliah:** Pemrograman Berbasis Web
 
 ---
 
 ## Daftar Isi
 1. [Bagian 1: Tugas Minggu Lalu (Minggu 9 - Express.js REST API Basics)](#bagian-1-tugas-minggu-lalu-minggu-9---expressjs-rest-api-basics)
 2. [Bagian 2: Laporan Tugas Minggu Ini (Tugas 2 / Minggu 10 - Express x Database PostgreSQL & Prisma ORM)](#bagian-2-laporan-tugas-minggu-ini-tugas-2--minggu-10---express-x-database-postgresql--prisma-orm)
-   - [1. Pendahuluan dan Arsitektur Sistem](#1-pendahuluan-dan-arsitektur-sistem)
-   - [2. Petunjuk Menjalankan Aplikasi](#2-petunjuk-menjalankan-aplikasi)
-   - [3. Daftar Endpoint Lengkap](#3-daftar-endpoint-lengkap)
-   - [4. Bukti Pengujian API dan Perubahan Database (Evidence)](#4-bukti-pengujian-api-dan-perubahan-database-evidence)
-   - [5. Implementasi Workflow Git Bertahap](#5-implementasi-workflow-git-bertahap)
-   - [6. Kesimpulan](#6-kesimpulan)
+   - [1. Pendahuluan](#1-pendahuluan)
+   - [2. Cara Menjalankan](#2-cara-menjalankan)
+   - [3. Daftar Endpoint](#3-daftar-endpoint)
+   - [4. Bukti Pengujian API & Database](#4-bukti-pengujian-api--database)
+   - [5. Alur Pengerjaan Git](#5-alur-pengerjaan-git)
 
 ---
 
@@ -75,15 +72,15 @@ klik tombol send request dari ### 1 sampai ### 4.
 
 # Bagian 2: Laporan Tugas Minggu Ini (Tugas 2 / Minggu 10 - Express x Database PostgreSQL & Prisma ORM)
 
-## 1. Pendahuluan dan Arsitektur Sistem
+## 1. Pendahuluan
 
-Pada tugas sebelumnya (Minggu ke-9), penyimpanan data produk pada aplikasi Express masih menggunakan array lokal di memori proses Node.js (*in-memory array*). Kelemahan mendasar dari pendekatan tersebut adalah data produk bersifat volatil/sementara dan akan hilang ter-reset setiap kali server dimulai ulang (*restart*).
+Pada tugas Minggu 9 sebelumnya, data produk masih disimpan di array JavaScript lokal sehingga data langsung ter-reset setiap kali server dimatikan atau di-restart.
 
-Pada Tugas ke-2 (Minggu ke-10) ini, aplikasi Express telah diintegrasikan dengan database relasional **PostgreSQL** menggunakan **Prisma ORM 7**. Seluruh operasi *Create*, *Read*, *Update*, dan *Delete* (CRUD) dilakukan secara persisten ke database menggunakan *Prisma Client singleton* yang dikonfigurasi dengan driver adapter PostgreSQL (`@prisma/adapter-pg` dan driver `pg`).
+Pada Tugas 2 (Minggu 10) ini, aplikasi Express dihubungkan ke database PostgreSQL menggunakan Prisma ORM. Seluruh operasi CRUD (Create, Read, Update, Delete) berjalan langsung ke database PostgreSQL, sehingga data tersimpan secara permanen.
 
-### 1.1 Skema Model Database (`prisma/schema.prisma`)
+### Skema Database (`prisma/schema.prisma`)
 
-Struktur tabel `Product` didefinisikan pada file skema Prisma sebagai berikut:
+Berikut adalah skema model `Product` yang digunakan:
 
 ```prisma
 model Product {
@@ -94,229 +91,191 @@ model Product {
 }
 ```
 
-**Keterangan Atribut:**
-- `id`: Kunci utama (*primary key*) bertipe Integer dengan mekanisme auto-increment yang digenerate langsung oleh database PostgreSQL.
-- `name`: Tipe data String yang menyimpan nama produk.
-- `price`: Tipe data Integer yang menyimpan nilai harga produk.
-- `createdAt`: Tipe data DateTime yang secara otomatis mencatat *timestamp* waktu penambahan data ke database.
+- `id`: Primary key integer (auto-increment).
+- `name`: Nama produk (String).
+- `price`: Harga produk (Integer).
+- `createdAt`: Waktu pembuatan data (otomatis terisi tanggal dan jam saat data dibuat).
 
 ---
 
-## 2. Petunjuk Menjalankan Aplikasi
+## 2. Cara Menjalankan
 
-### 2.1 Prasyarat
-1. Pastikan PostgreSQL sudah terpasang dan berjalan (misal: di WSL):
+1. **Jalankan PostgreSQL:**
    ```bash
    sudo service postgresql start
    ```
-2. Buat database PostgreSQL bernama `express_pemweb`:
+
+2. **Buat Database:**
    ```bash
    sudo -u postgres psql -c "CREATE DATABASE express_pemweb;"
    ```
-3. Salin file environment dan sesuaikan konfigurasi koneksi:
+
+3. **Setup Environment:**
+   Salin file `.env.example` ke `.env`:
    ```bash
    cp .env.example .env
    ```
-   Isi file `.env`:
+   Pastikan isi koneksi pada `.env`:
    ```env
    DATABASE_URL="postgresql://postgres:postgres@localhost:5432/express_pemweb?schema=public"
    ```
 
-### 2.2 Migrasi Database dan Generate Prisma Client
-Jalankan perintah berikut di root folder project:
-```bash
-npm install
-npx prisma migrate dev --name init
-npx prisma generate
-```
+4. **Install Dependensi & Jalankan Migrasi:**
+   ```bash
+   npm install
+   npx prisma migrate dev --name init
+   npx prisma generate
+   ```
 
-### 2.3 Menjalankan Server Development
-```bash
-npm run dev
-```
-Server Express akan aktif dan mendengarkan request pada port `3000` (`http://localhost:3000`).
+5. **Jalankan Server Express:**
+   ```bash
+   npm run dev
+   ```
+   Server berjalan di `http://localhost:3000`.
 
-### 2.4 Memantau Database Secara Visual (Prisma Studio)
-Untuk melihat dan memvalidasi isi tabel PostgreSQL secara visual melalui antarmuka web GUI:
-```bash
-npx prisma studio
-```
-Akses Prisma Studio di browser pada URL `http://localhost:5555`.
+6. **Melihat Database di Browser (Prisma Studio):**
+   ```bash
+   npx prisma studio
+   ```
+   Buka `http://localhost:5555` di browser untuk melihat isi tabel secara langsung.
 
 ---
 
-## 3. Daftar Endpoint Lengkap
-
-Aplikasi menyediakan antarmuka REST API lengkap untuk mengelola produk secara persisten:
+## 3. Daftar Endpoint
 
 | Method | Endpoint | Request Body | Status Code | Deskripsi |
 | :--- | :--- | :--- | :---: | :--- |
-| `GET` | `/products` | - | `200 OK` | Mengambil seluruh baris data produk dari tabel database PostgreSQL |
-| `GET` | `/products/:id` | - | `200 OK` / `404 Not Found` | Mengambil data produk spesifik berdasarkan parameter ID |
-| `POST` | `/products` | `{"name": string, "price": number}` | `201 Created` / `400 Bad Request` | Menambahkan baris produk baru ke dalam database |
-| `PUT` | `/products` | `{"id": number, "name": string, "price": number}` | `200 OK` / `400 Bad Request` / `404 Not Found` | Memperbarui data produk yang sudah ada (ID dikirim via request body sesuai ketentuan tugas) |
-| `DELETE` | `/products/:id` | - | `200 OK` / `400 Bad Request` / `404 Not Found` | Menghapus baris produk dari database berdasarkan parameter ID |
+| `GET` | `/products` | - | `200 OK` | Menampilkan seluruh produk dari database |
+| `GET` | `/products/:id` | - | `200 OK` / `404 Not Found` | Menampilkan detail produk berdasarkan ID |
+| `POST` | `/products` | `{"name": string, "price": number}` | `201 Created` / `400 Bad Request` | Menambahkan produk baru ke database |
+| `PUT` | `/products` | `{"id": number, "name": string, "price": number}` | `200 OK` / `400 Bad Request` / `404 Not Found` | Mengupdate produk (ID dikirim di body sesuai ketentuan tugas) |
+| `DELETE` | `/products/:id` | - | `200 OK` / `400 Bad Request` / `404 Not Found` | Menghapus produk dari database berdasarkan ID |
 | `GET` | `/hello` | - (Query param: `?nama=...`) | `200 OK` | Endpoint demo greeting |
 
 ---
 
-## 4. Bukti Pengujian API dan Perubahan Database (Evidence)
+## 4. Bukti Pengujian API & Database
 
-Seluruh pengujian dilakukan menggunakan file `test.http` dan ekstensi REST Client di VS Code, serta diverifikasi secara visual melalui antarmuka **Prisma Studio**.
+Pengujian dilakukan menggunakan ekstensi REST Client di VS Code melalui file `test.http`, serta diverifikasi menggunakan Prisma Studio.
 
-### 4.1 Skenario 1: Menampilkan Seluruh Data Produk (GET /products)
-- **Request:** `GET http://localhost:3000/products`
-- **Ekspektasi:** HTTP `200 OK` dengan payload JSON berisi seluruh daftar produk.
+### 4.1 Menampilkan Seluruh Data Produk (GET /products)
+Request: `GET http://localhost:3000/products`  
+Hasil respon status `200 OK` dengan list data produk dalam bentuk JSON:
 
-![Gambar 2.1: Bukti Respon API GET /products](docs/tugas-2/01_get_all.png)
-
-*Analisis:* Endpoint berhasil mengambil seluruh data produk yang tersimpan pada tabel database PostgreSQL dengan status code `200 OK`.
+![Bukti GET All](docs/tugas-2/01_get_all.png)
 
 ---
 
-### 4.2 Skenario 2: Membuat Data Produk Baru (POST /products)
-- **Request:**
-  ```http
-  POST http://localhost:3000/products
-  Content-Type: application/json
+### 4.2 Menambahkan Produk Baru (POST /products)
+Request:
+```http
+POST http://localhost:3000/products
+Content-Type: application/json
 
-  {
-    "name": "Buku Tulis Sinar Dunia",
-    "price": 6000
-  }
-  ```
-- **Ekspektasi:** HTTP `201 Created` dengan objek produk baru yang memiliki ID auto-increment dari database.
+{
+  "name": "Buku Tulis Sinar Dunia",
+  "price": 6000
+}
+```
 
-#### Bukti Perubahan Database (Before vs After)
+**Tampilan database sebelum data ditambahkan (Before):**  
+![Prisma Studio Sebelum POST](docs/tugas-2/02_post_db_before.png)
 
-**Tampilan Database Sebelum Penambahan Data (Before):**  
-![Gambar 2.2: Prisma Studio Sebelum POST](docs/tugas-2/02_post_db_before.png)
+**Respon API POST /products (201 Created):**  
+![Respon POST](docs/tugas-2/03_post_response.png)
 
-**Bukti Respon API POST /products (201 Created):**  
-![Gambar 2.3: Bukti Respon POST](docs/tugas-2/03_post_response.png)
+**Tampilan database setelah data ditambahkan (After):**  
+![Prisma Studio Sesudah POST](docs/tugas-2/04_post_db_after.png)
 
-**Tampilan Database Sesudah Penambahan Data (After):**  
-![Gambar 2.4: Prisma Studio Sesudah POST](docs/tugas-2/04_post_db_after.png)
-
-*Analisis:* Data baru berhasil masuk ke database PostgreSQL dengan status code `201 Created`. Tampilan Prisma Studio membuktikan bahwa record baru bertambah secara persisten di database.
+Data baru berhasil tersimpan ke tabel database dengan ID auto-increment.
 
 ---
 
-### 4.3 Skenario 3: Memperbarui Data Produk yang Sudah Ada (PUT /products)
-Sesuai slide modul ke-49, request body pada operasi PUT memiliki format yang sama dengan POST dengan tambahan atribut `id`.
+### 4.3 Mengupdate Produk (PUT /products)
+Sesuai instruksi slide 49, request PUT menerima atribut `id` pada request body:
+```http
+PUT http://localhost:3000/products
+Content-Type: application/json
 
-- **Request:**
-  ```http
-  PUT http://localhost:3000/products
-  Content-Type: application/json
+{
+  "id": 1,
+  "name": "Buku Tulis Sinar Dunia (Edisi Revisi)",
+  "price": 7500
+}
+```
 
-  {
-    "id": 1,
-    "name": "Buku Tulis Sinar Dunia (Edisi Revisi)",
-    "price": 7500
-  }
-  ```
-- **Ekspektasi:** HTTP `200 OK` dengan data produk yang telah terupdate.
+**Tampilan database sebelum data diupdate (Before):**  
+![Prisma Studio Sebelum PUT](docs/tugas-2/05_put_db_before.png)
 
-#### Bukti Perubahan Database (Before vs After)
+**Respon API PUT /products (200 OK):**  
+![Respon PUT](docs/tugas-2/06_put_response.png)
 
-**Tampilan Database Sebelum Pembaruan Data (Before):**  
-![Gambar 2.5: Prisma Studio Sebelum PUT](docs/tugas-2/05_put_db_before.png)
+**Tampilan database setelah data diupdate (After):**  
+![Prisma Studio Sesudah PUT](docs/tugas-2/07_put_db_after.png)
 
-**Bukti Respon API PUT /products (200 OK):**  
-![Gambar 2.6: Bukti Respon PUT](docs/tugas-2/06_put_response.png)
-
-**Tampilan Database Sesudah Pembaruan Data (After):**  
-![Gambar 2.7: Prisma Studio Sesudah PUT](docs/tugas-2/07_put_db_after.png)
-
-*Analisis:* Data produk dengan ID yang ditentukan berhasil diperbarui pada database PostgreSQL dengan status `200 OK` tanpa mengubah ID produk tersebut.
+Data berhasil diperbarui di database tanpa mengubah nilai ID produk.
 
 ---
 
-### 4.4 Skenario 4: Menghapus Data Produk (DELETE /products/:id)
-- **Request:** `DELETE http://localhost:3000/products/1`
-- **Ekspektasi:** HTTP `200 OK` dengan pesan konfirmasi penghapusan data.
+### 4.4 Menghapus Produk (DELETE /products/:id)
+Request: `DELETE http://localhost:3000/products/1`
 
-#### Bukti Perubahan Database (Before vs After)
+**Tampilan database sebelum data dihapus (Before):**  
+![Prisma Studio Sebelum DELETE](docs/tugas-2/08_delete_db_before.png)
 
-**Tampilan Database Sebelum Penghapusan Data (Before):**  
-![Gambar 2.8: Prisma Studio Sebelum DELETE](docs/tugas-2/08_delete_db_before.png)
+**Respon API DELETE /products/:id (200 OK):**  
+![Respon DELETE](docs/tugas-2/09_delete_response.png)
 
-**Bukti Respon API DELETE /products/:id (200 OK):**  
-![Gambar 2.9: Bukti Respon DELETE](docs/tugas-2/09_delete_response.png)
+**Tampilan database setelah data dihapus (After):**  
+![Prisma Studio Sesudah DELETE](docs/tugas-2/10_delete_db_after.png)
 
-**Tampilan Database Sesudah Penghapusan Data (After):**  
-![Gambar 2.10: Prisma Studio Sesudah DELETE](docs/tugas-2/10_delete_db_after.png)
-
-*Analisis:* Baris data produk dengan ID yang dituju berhasil terhapus dari tabel PostgreSQL. Prisma Studio mengonfirmasi bahwa baris data tersebut telah hilang dari database.
+Data produk ID 1 berhasil dihapus dan tidak lagi ada di tabel database.
 
 ---
 
-### 4.5 Skenario 5: Kesalahan Validasi Input (Validation Error - HTTP 400)
+### 4.5 Pengujian Validasi Input (Error 400 Bad Request)
 
-Pengujian skenario kegagalan validasi dilakukan untuk menguji kehandalan server dalam menangani request yang tidak sesuai format kontrak API.
+- **Field Kosong (tanpa field price):**  
+  ![Validasi Field Kosong](docs/tugas-2/11_err_missing_field.png)
 
-#### 4.5.1 Kasus Field Name atau Price Kosong
-Request `POST /products` hanya mengirimkan atribut `name` tanpa atribut `price`:  
-![Gambar 2.11: Validasi Field Kosong](docs/tugas-2/11_err_missing_field.png)
+- **Tipe Data Harga Bukan Angka (`price: "gratis"`):**  
+  ![Validasi Harga Bukan Angka](docs/tugas-2/12_err_invalid_price.png)
 
-#### 4.5.2 Kasus Tipe Data Price Tidak Valid (Bukan Angka)
-Request `POST /products` mengirimkan nilai `price` berupa string non-numerik (`"gratis"`):  
-![Gambar 2.12: Validasi Harga Bukan Angka](docs/tugas-2/12_err_invalid_price.png)
-
-#### 4.5.3 Kasus Request PUT Tanpa Menyertakan ID
-Request `PUT /products` dikirimkan tanpa menyertakan field `id` pada body:  
-![Gambar 2.13: Validasi PUT Tanpa ID](docs/tugas-2/13_err_missing_id.png)
-
-*Analisis:* Server berhasil mendeteksi input yang tidak valid dan merespon dengan status `400 Bad Request` serta payload JSON deskriptif tanpa menyebabkan aplikasi mengalami *crash*.
+- **PUT Tanpa Menyertakan ID pada Body:**  
+  ![Validasi PUT Tanpa ID](docs/tugas-2/13_err_missing_id.png)
 
 ---
 
-### 4.6 Skenario 6: Data Tidak Ditemukan (Not Found - HTTP 404)
+### 4.6 Pengujian Data Tidak Ditemukan (Error 404 Not Found)
 
-Pengujian dilakukan untuk memastikan request dengan ID yang tidak terdaftar di database ditangani secara elegan.
+- **GET dengan ID tidak ada (`GET /products/9999`):**  
+  ![404 GET](docs/tugas-2/14_404_get.png)
 
-#### 4.6.1 Kasus GET dengan ID Tidak Ada (`GET /products/9999`)
-![Gambar 2.14: 404 GET](docs/tugas-2/14_404_get.png)
+- **PUT dengan ID tidak ada (`id: 9999`):**  
+  ![404 PUT](docs/tugas-2/15_404_put.png)
 
-#### 4.6.2 Kasus PUT dengan ID Tidak Ada (`PUT /products` id: 9999)
-![Gambar 2.15: 404 PUT](docs/tugas-2/15_404_put.png)
-
-#### 4.6.3 Kasus DELETE dengan ID Tidak Ada (`DELETE /products/9999`)
-![Gambar 2.16: 404 DELETE](docs/tugas-2/16_404_delete.png)
-
-*Analisis:* Ketika query `prisma.product.findUnique` menghasilkan `null`, server merespon dengan status code `404 Not Found` dan pesan JSON `{"message": "Produk tidak ditemukan"}`.
+- **DELETE dengan ID tidak ada (`DELETE /products/9999`):**  
+  ![404 DELETE](docs/tugas-2/16_404_delete.png)
 
 ---
 
-## 5. Implementasi Workflow Git Bertahap
+## 5. Alur Pengerjaan Git
 
-Sebagai bukti proses pengerjaan bertahap sesuai prinsip *software engineering* dan standar *Conventional Commits*, alur kerja di GitHub dibagi menjadi branch bertahap dan digabungkan melalui Pull Request:
+Pengerjaan tugas ini dilakukan secara bertahap menggunakan branch dan pull request:
 
-1. **Tahap 1: Setup Prisma & Database Migration**
-   - **Branch:** `tugas-2/setup-prisma`
-   - **Commits:**
-     - `build(tugas-2): install prisma 7 and postgresql driver dependencies`
-     - `feat(tugas-2): define product schema and create initial database migration`
-   - **Pull Request #1:** `main <- tugas-2/setup-prisma` (Merged)
+1. **Tahap 1: Setup Prisma & Migrasi Database**
+   - Branch: `tugas-2/setup-prisma`
+   - Install dependensi Prisma dan driver PostgreSQL.
+   - Definisi skema model `Product` dan migrasi database awal.
+   - Pull Request #1 di-merge ke `main`.
 
-2. **Tahap 2: Implementasi CRUD Produk dengan Prisma ORM**
-   - **Branch:** `tugas-2/crud-products`
-   - **Commits:**
-     - `feat(tugas-2): implement product CRUD controller and routes with prisma`
-   - **Pull Request #2:** `main <- tugas-2/crud-products` (Merged)
+2. **Tahap 2: Implementasi Controller & Route CRUD**
+   - Branch: `tugas-2/crud-products`
+   - Implementasi Prisma Client singleton dan fungsi CRUD pada `product.controller.ts`.
+   - Setup route GET, POST, PUT (ID di body), dan DELETE.
+   - Pull Request #2 di-merge ke `main`.
 
-3. **Tahap 3: Skenario Pengujian REST Client & Dokumentasi Lengkap**
-   - **Branch:** `tugas-2/testing-docs`
-   - **Commits:**
-     - `test(tugas-2): add REST client scenarios for CRUD and validation errors`
-     - `docs(tugas-2): update instructions for database setup and full endpoint list`
-     - `style(tugas-2): simplify test.http comment delimiters for REST Client`
-     - `docs(tugas-2): add comprehensive markdown report with evidence screenshots in readme`
-   - **Pull Request:** `main <- tugas-2/testing-docs`
-
----
-
-## 6. Kesimpulan
-
-Integrasi Express.js dengan PostgreSQL menggunakan Prisma ORM 7 telah berhasil diimplementasikan secara menyeluruh. Seluruh fitur yang disyaratkan pada Tugas 2 (GET all, GET by ID, POST data baru, PUT update data dengan ID pada body, dan DELETE data berdasarkan ID) berfungsi secara normal dan persisten. Validasi input (`400 Bad Request`) dan penanganan *resource not found* (`404 Not Found`) telah teruji dan terdokumentasi lengkap dengan bukti screenshot *Before* dan *After* pada Prisma Studio.
+3. **Tahap 3: Testing & Dokumentasi**
+   - Branch: `tugas-2/testing-docs`
+   - Pembuatan 11 skenario pengujian pada `test.http`.
+   - Dokumentasi pengujian dan bukti screenshot pada `README.md`.
